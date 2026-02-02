@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"log"
-	"simpleMQ/handlers"
+	"simpleMQ/internal/handlers"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	})
 
 	r.POST("/produce", func(c *gin.Context) {
-		handlers.HandleMessage(c)
+		handlers.HandleProducerMessage(c)
 	})
 
 	r.POST("/consume", func(c *gin.Context) {
