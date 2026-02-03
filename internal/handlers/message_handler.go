@@ -25,7 +25,7 @@ func HandleProducerMessage(c *gin.Context) {
 		return
 	}
 
-	var context models.FlowContext = make(models.FlowContext)
+	var context = make(models.FlowContext)
 	context[models.TOPIC] = produceRequest.Topic
 	context[models.PAYLOAD] = produceRequest.Payload
 	err_2 := service.AddMessage(&context)
@@ -54,7 +54,7 @@ func HandleConsumerMessage(c *gin.Context) {
 		return
 	}
 
-	var context models.FlowContext = make(models.FlowContext)
+	var context = make(models.FlowContext)
 	context[models.TOPIC] = consumeRequest.Topic
 	message, err_2 := service.RemoveMessage(&context)
 
