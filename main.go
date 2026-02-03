@@ -19,7 +19,7 @@ func main() {
 	})
 
 	r.POST("/consume", func(c *gin.Context) {
-		handlers.HandleMessage(c)
+		handlers.HandleConsumerMessage(c)
 	})
 
 	r.POST("/publish", func(c *gin.Context) {

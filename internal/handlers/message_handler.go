@@ -28,7 +28,7 @@ func HandleProducerMessage(c *gin.Context) {
 	var context models.FlowContext = make(models.FlowContext)
 	context[models.TOPIC] = produceRequest.Topic
 	context[models.PAYLOAD] = produceRequest.Payload
-	err_2 := service.AddMessage(context)
+	err_2 := service.AddMessage(&context)
 
 	if err_2 != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -39,6 +39,34 @@ func HandleProducerMessage(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": produceRequest,
+	})
+
+}
+
+func HandleConsumerMessage(c *gin.Context) {
+
+	var consumeRequest models.ConsumerRequest
+	err := c.ShouldBindBodyWithJSON(&consumeRequest)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "error in parsing",
+		})
+		return
+	}
+
+	var context models.FlowContext = make(models.FlowContext)
+	context[models.TOPIC] = consumeRequest.Topic
+	message, err_2 := service.RemoveMessage(&context)
+
+	if err_2 != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": err_2.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"payload": message.Payload,
 	})
 
 }

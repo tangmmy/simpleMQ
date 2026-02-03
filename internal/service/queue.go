@@ -8,25 +8,25 @@ import (
 type Message struct {
 	Topic         string
 	IsPersistence bool
-	Payload       any
+	Payload       string
 }
 
 const maxSize = 10
 
 type Queue struct {
-	Queue      [maxSize]Message
+	Queue      [maxSize]*Message
 	StartIndex int // meaning that element from at this position will be removed first
 	EndIndex   int // meaning that a new element will be insert at this position
 }
 
 var topicMap map[string]*Queue = make(map[string]*Queue)
 
-func AddMessage(context models.FlowContext) error {
+func AddMessage(context *models.FlowContext) error {
 
 	message := Message{
-		Topic:         context[models.TOPIC].(string),
+		Topic:         (*context)[models.TOPIC].(string),
 		IsPersistence: false,
-		Payload:       context[models.TOPIC].(string),
+		Payload:       (*context)[models.PAYLOAD].(string),
 	}
 	targetQueue := topicMap[message.Topic]
 
@@ -42,8 +42,33 @@ func AddMessage(context models.FlowContext) error {
 	}
 
 	//the queue is not full
-	targetQueue.Queue[targetQueue.EndIndex] = message
+	targetQueue.Queue[targetQueue.EndIndex] = &message
 	targetQueue.EndIndex = (targetQueue.EndIndex + 1) % maxSize
 
 	return nil
+}
+
+func RemoveMessage(context *models.FlowContext) (*Message, error) {
+
+	targetQueue := topicMap[(*context)[models.TOPIC].(string)]
+
+	//if cannot find, throw error
+	if targetQueue == nil {
+		return nil, errors.New("topic not found")
+	}
+
+	//the queue is empty, throw error
+	if targetQueue.EndIndex == targetQueue.StartIndex {
+		return nil, errors.New("queue is empty")
+	}
+
+	//the queue is not empty
+	message := Message{
+		Payload: targetQueue.Queue[targetQueue.StartIndex].Payload,
+	}
+
+	targetQueue.Queue[targetQueue.StartIndex] = nil
+	targetQueue.StartIndex = (targetQueue.StartIndex + 1) % maxSize
+
+	return &message, nil
 }
