@@ -10,7 +10,7 @@ import (
 func TestAddMessage(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	var context models.FlowContext = make(models.FlowContext)
+	var context = make(models.FlowContext)
 	context[models.TOPIC] = "1234"
 	context[models.PAYLOAD] = "12345678"
 
@@ -24,12 +24,16 @@ func TestAddMessage(t *testing.T) {
 func TestRemoveMessage(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	var context models.FlowContext = make(models.FlowContext)
+	var context = make(models.FlowContext)
 	context[models.TOPIC] = "1234"
 	context[models.PAYLOAD] = "12345678"
 
 	//add first
-	AddMessage(&context)
+	err := AddMessage(&context)
+
+	if err != nil {
+		t.Fatalf("expected success but got %s", err)
+	}
 
 	//then try remove
 	message, err := RemoveMessage(&context)
